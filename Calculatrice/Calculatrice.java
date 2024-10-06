@@ -1,217 +1,238 @@
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.*;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+public class Calculatrice extends JFrame {
+	private boolean selectedOperator = false;
+	private boolean misyChiffre = false;
+	private boolean calculTermine = false;
+	private final JPanel conteneur = new JPanel();
+	private final JPanel conteneur2 = new JPanel(new GridLayout(5, 4, 5, 5));  // Modifier ici pour un meilleur agencement
+	private final JLabel ecranLabel = new JLabel(" ");
+	private final JTextArea historiqueArea = new JTextArea(8, 20);
+	private final BorderLayout borderLayout = new BorderLayout();
+	private final String[] tabTouche = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", ".", "=", "C", "+", "-", "*", "/", "+/-"};
+	private final JButton[] tabBouton = new JButton[tabTouche.length];
+	private double chiffre = 0;
+	private String str = " ";
+	private String operateur = "";
 
-public class Calculatrice extends JFrame{
-	private boolean selectedOperator=false;
-	private boolean misyChiffre=false;
-	private	JPanel conteneur= new JPanel();
-	private	JPanel conteneur2= new JPanel();
-	private	JPanel conteneur3= new JPanel();
-	private JLabel ecranLabel= new JLabel(" ");
-	private BorderLayout borderLayout =new BorderLayout();
-	private	String[] tabTouche= {"1","2","3","4","5","6","7","8","9","0",".","=","C","+","-","*","/"};
-	private	JButton[] tabBouton= new JButton[tabTouche.length];
-	private double chiffre;
-	private String str=" ";
-	private String operateur="";
 	public void init() {
-		
-		ecranLabel.setFont(new Font("courier",Font.BOLD,20));
+		// Configuration de l'écran principal (cadre)
+		ecranLabel.setFont(new Font("Courier", Font.BOLD, 20));
 		ecranLabel.setHorizontalAlignment(JLabel.RIGHT);
-		ecranLabel.setPreferredSize(new Dimension(50,50));
+		ecranLabel.setPreferredSize(new Dimension(50, 50));
+		ecranLabel.setOpaque(true);
+		ecranLabel.setBackground(Color.LIGHT_GRAY);
+		ecranLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+
+		historiqueArea.setFont(new Font("Courier", Font.PLAIN, 16));
+		historiqueArea.setEditable(false);
+		historiqueArea.setBackground(Color.WHITE);
+		historiqueArea.setBorder(BorderFactory.createTitledBorder("Historique"));
+		JScrollPane scrollPane = new JScrollPane(historiqueArea);
+		scrollPane.setPreferredSize(new Dimension(200, 150));  // Fixer une taille maximale
+
 		conteneur.setLayout(borderLayout);
-		conteneur2.setPreferredSize(new Dimension(40,50));
-		conteneur3.setPreferredSize(new Dimension(70,50));
-		conteneur.add(ecranLabel,BorderLayout.NORTH);
-		conteneur.add(conteneur2,BorderLayout.CENTER);
-		conteneur.add(conteneur3,BorderLayout.EAST);
+		conteneur2.setPreferredSize(new Dimension(300, 300));
+
+		// Ajout des composants
+		conteneur.add(ecranLabel, BorderLayout.NORTH);
+		conteneur.add(scrollPane, BorderLayout.WEST); // Zone d'historique
+		conteneur.add(conteneur2, BorderLayout.CENTER);
 		conteneur.setBorder(BorderFactory.createLineBorder(Color.black));
-		for(int i=0;i<tabTouche.length;i++) {
-			tabBouton[i]= new JButton(""+tabTouche[i]+"");
-		//	tabBouton[i].setFont(new Font("Arial",Font.BOLD,20));
-			tabBouton[i].setPreferredSize(new Dimension(65,55));
+
+		for (int i = 0; i < tabTouche.length; i++) {
+			tabBouton[i] = new JButton(tabTouche[i]);
+			tabBouton[i].setPreferredSize(new Dimension(50, 50));
 			conteneur2.add(tabBouton[i]);
 			tabBouton[i].addActionListener(new chiffreListener());
-			switch (i){
-				case 11:
-						conteneur2.add(tabBouton[i]);
-						tabBouton[i].addActionListener(new egalListener());			
-						break;
-				case 12:
-						conteneur3.add(tabBouton[i]);
-						tabBouton[i].setForeground(Color.red);
-						tabBouton[i].addActionListener(new clearListener());
-						break;
-				case 13:
-						conteneur3.add(tabBouton[i]);
-						tabBouton[i].addActionListener(new plusListener());
-						break;
-				case 14:
-						conteneur3.add(tabBouton[i]);
-						tabBouton[i].addActionListener(new moinsListener());
-						break;	
-				case 15:
-						conteneur3.add(tabBouton[i]);
-						tabBouton[i].addActionListener(new foisListener());
-						break;
-				case 16:
-						conteneur3.add(tabBouton[i]);
-						tabBouton[i].addActionListener(new divisionListener());
-						break;	
+
+			// Associer les boutons avec les ActionListener correspondants
+			switch (i) {
+				case 11: // =
+					tabBouton[i].addActionListener(new egalListener());
+					break;
+				case 12: // C
+					tabBouton[i].setForeground(Color.red);
+					tabBouton[i].addActionListener(new clearListener());
+					break;
+				case 13: // +
+					tabBouton[i].addActionListener(new plusListener());
+					break;
+				case 14: // -
+					tabBouton[i].addActionListener(new moinsListener());
+					break;
+				case 15: // *
+					tabBouton[i].addActionListener(new foisListener());
+					break;
+				case 16: // /
+					tabBouton[i].addActionListener(new divisionListener());
+					break;
+				case 17: // +/-
+					tabBouton[i].addActionListener(new changeSignListener());
+					break;
 			}
 		}
-
-		
 	}
-	public Calculatrice(){
+
+	public Calculatrice() {
 		init();
-		this.setSize(300,400);
+		this.setSize(450, 460);
 		this.setTitle("Calculette");
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setResizable(false);
 		this.setContentPane(conteneur);
+		this.setResizable(false);
 		this.setVisible(true);
 	}
+
 	public void calcul() {
-		double chiffre2=chiffre;
-			if(operateur=="+") {
+		double input = Double.parseDouble(ecranLabel.getText());
+		historiqueArea.append(chiffre + " " + operateur + " " + input + " = ");
 
-				chiffre += Double.parseDouble(ecranLabel.getText()) ;
-				System.out.println(""+chiffre2+" + "+ecranLabel.getText()+"= "+chiffre);
-				ecranLabel.setText(""+chiffre);
+		switch (operateur) {
+			case "+":
+				chiffre += input;
+				break;
+			case "-":
+				chiffre -= input;
+				break;
+			case "*":
+				chiffre *= input;
+				break;
+			case "/":
+				if (input != 0) {
+					chiffre /= input;
+				} else {
+					ecranLabel.setText("Erreur");
+					historiqueArea.append("Erreur\n");
+					return;
 				}
-			if(operateur=="-") {
-
-				chiffre -= Double.parseDouble(ecranLabel.getText());
-				System.out.println(""+chiffre2+" - "+ecranLabel.getText()+"= "+chiffre);
-				ecranLabel.setText(""+chiffre);
-			}
-			if(operateur=="*") {
-
-				chiffre *= Double.parseDouble(ecranLabel.getText());
-				System.out.println(""+chiffre2+" * "+ecranLabel.getText()+"= "+chiffre);
-				ecranLabel.setText(""+chiffre);
-			
+				break;
 		}
-			if(operateur=="/") {
-				try {
-					chiffre /= Double.parseDouble(ecranLabel.getText()) ;
-					System.out.println(""+chiffre2+" / "+ecranLabel.getText()+"= "+chiffre);
-					ecranLabel.setText(""+chiffre);
-				}
-				catch(ArithmeticException e) {
-					ecranLabel.setText("0");
-				}
-			}
-			
+		ecranLabel.setText(String.valueOf(chiffre));
+		historiqueArea.append(chiffre + "\n");
+		selectedOperator = false;
+		misyChiffre = false;
+		calculTermine = true;
 	}
 	public void mametrakaValeur() {
-		if(selectedOperator && !misyChiffre && str!= " " ) {
-			chiffre= Double.parseDouble(ecranLabel.getText());
-			str=" ";
+		if (selectedOperator && !misyChiffre && !str.equals(" ")) {
+			chiffre = Double.parseDouble(ecranLabel.getText());
+			str = " ";
 			ecranLabel.setText(str);
-			misyChiffre=true;
+			misyChiffre = true;
 		}
-		if(selectedOperator && misyChiffre) {
-			str=" ";
+		if (selectedOperator && misyChiffre) {
+			str = " ";
 			ecranLabel.setText(str);
-			
 		}
 	}
-	class chiffreListener implements ActionListener{
 
+	// ActionListener pour les chiffres
+	class chiffreListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			for (int i=0;i<11;i++) {
-					str= ecranLabel.getText();
-					if(e.getSource()==tabBouton[i]) {
-							str += tabTouche[i];
-							ecranLabel.setText(str);
-						}
-					
-				 }
+			if (calculTermine) {
+				str = "";
+				calculTermine = false;
 			}
-			
-	}
-		
-	
-	
-	class plusListener implements ActionListener{
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			selectedOperator=true;
-			mametrakaValeur();
-			operateur= "+";
-			
-		}
-		
-	
-	}
-	class moinsListener implements ActionListener{
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			selectedOperator=true;
-			mametrakaValeur();
-			operateur= "-";
-			
-		}
-		
-	}class foisListener implements ActionListener{
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			selectedOperator=true;
-			mametrakaValeur();
-			operateur= "*";
-			
-		}
-		
-	}class divisionListener implements ActionListener{
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			selectedOperator=true;
-			mametrakaValeur();
-			operateur= "/";
-		
-		}
-		
-	}
-	class clearListener implements ActionListener{
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
-				misyChiffre=false;
-				ecranLabel.setText(" ");
+			for (int i = 0; i < 11; i++) {
+				if (e.getSource() == tabBouton[i]) {
+					str += tabTouche[i];
+					ecranLabel.setText(str);
+				}
+			}
 		}
-		
 	}
 
-	class egalListener implements ActionListener{
-
+	// ActionListeners pour les opérations
+	class plusListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if(misyChiffre) {
+			if (selectedOperator) {
 				calcul();
 			}
-		
+			selectedOperator = true;
+			mametrakaValeur();
+			operateur = "+";
 		}
-			
 	}
-		
-	
+
+	class moinsListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (selectedOperator) {
+				calcul();
+			}
+			selectedOperator = true;
+			mametrakaValeur();
+			operateur = "-";
+		}
+	}
+
+	class foisListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (selectedOperator) {
+				calcul();
+			}
+			selectedOperator = true;
+			mametrakaValeur();
+			operateur = "*";
+		}
+	}
+
+	class divisionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (selectedOperator) {
+				calcul();
+			}
+			selectedOperator = true;
+			mametrakaValeur();
+			operateur = "/";
+		}
+	}
+
+	// Listener pour le bouton = (égal)
+	class egalListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (misyChiffre) {
+				calcul();
+			}
+		}
+	}
+
+	// Listener pour le bouton C (clear)
+	class clearListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			chiffre = 0;
+			str = " ";
+			operateur = "";
+			misyChiffre = false;
+			selectedOperator = false;
+			calculTermine = false;
+			ecranLabel.setText(" ");
+		}
+	}
+
+	// Listener pour le changement de signe (+/-)
+	class changeSignListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			double valeur = Double.parseDouble(ecranLabel.getText());
+			valeur = -valeur;
+			ecranLabel.setText(String.valueOf(valeur));
+		}
+	}
+
 	public static void main(String[] args) {
-		Calculatrice calculatrice= new Calculatrice();
-
+		new Calculatrice();
 	}
-
 }
