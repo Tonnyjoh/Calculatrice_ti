@@ -8,7 +8,7 @@ public class Calculatrice extends JFrame {
 	private boolean misyChiffre = false;
 	private boolean calculTermine = false;
 	private final JPanel conteneur = new JPanel();
-	private final JPanel conteneur2 = new JPanel(new GridLayout(5, 4, 5, 5));  // Modifier ici pour un meilleur agencement
+	private final JPanel conteneur2 = new JPanel(new GridLayout(5, 4, 5, 5));
 	private final JLabel ecranLabel = new JLabel(" ");
 	private final JTextArea historiqueArea = new JTextArea(8, 20);
 	private final BorderLayout borderLayout = new BorderLayout();
